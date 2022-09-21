@@ -43,13 +43,13 @@ namespace PaycoreProject.Controllers
             userService.Register(user);
             return Ok(new {message="Registration successfull"});
         }
-
+        [Authorize]
         [HttpGet]
         public IActionResult GetUserOffer(int userId)
         {
           return  Ok(userService.GetUserOffer(userId));
         }
-
+        [Authorize]
         [HttpGet("OfferForProducts")]
         public IActionResult OfferForProducts(int userId)
         {

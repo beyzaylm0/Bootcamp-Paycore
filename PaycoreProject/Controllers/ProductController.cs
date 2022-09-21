@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PaycoreProject.Model;
@@ -17,6 +18,7 @@ namespace PaycoreProject.Controllers
             this.service = service;
             this.mapper = mapper;
         }
+        [Authorize]
         [HttpGet]
         public virtual IActionResult GetAll()
         {
@@ -34,7 +36,7 @@ namespace PaycoreProject.Controllers
 
             return Ok(result);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public virtual IActionResult GetById(int id)
         {
@@ -52,7 +54,7 @@ namespace PaycoreProject.Controllers
 
             return Ok(result);
         }
-
+        [Authorize]
         [HttpPost]
         public virtual IActionResult Create([FromBody] ProductDto dto)
         {
@@ -75,7 +77,7 @@ namespace PaycoreProject.Controllers
 
             return BadRequest(result);
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public virtual IActionResult Update(int id, [FromBody] ProductDto dto)
         {
@@ -98,7 +100,7 @@ namespace PaycoreProject.Controllers
 
             return BadRequest(result);
         }
-
+        [Authorize]
         [HttpDelete]
         public virtual IActionResult Delete(int id)
         {
@@ -112,50 +114,6 @@ namespace PaycoreProject.Controllers
             return BadRequest(result);
         }
 
-        //[HttpPost("giveoffer")]
-        //public virtual IActionResult GiveOffer([FromBody] GiveOfferDto dto)
-        //{
-        //    var result = service.GiveOffer(dto);
-
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(result);
-        //    }
-
-        //    if (result.Response is null)
-        //    {
-        //        return NoContent();
-        //    }
-
-        //    if (result.Success)
-        //    {
-        //        return StatusCode(201, result);
-        //    }
-
-        //    return BadRequest(result);
-        //}
-      
-        //[HttpPost("buy")]
-        //public virtual IActionResult Buy([FromBody] SoldDto dto)
-        //{
-        //    var result = service.Buy(dto);
-
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(result);
-        //    }
-
-        //    if (result.Response is null)
-        //    {
-        //        return NoContent();
-        //    }
-
-        //    if (result.Success)
-        //    {
-        //        return StatusCode(201, result);
-        //    }
-
-        //    return BadRequest(result);
-        //}
+       
     }
 }

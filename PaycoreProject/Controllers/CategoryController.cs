@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PaycoreProject.Model;
@@ -17,6 +18,7 @@ namespace PaycoreProject.Controllers
             this.service = service;
             this.mapper = mapper;
         }
+        [Authorize]
         [HttpGet]
         public  virtual IActionResult GetAll()
         {
@@ -35,6 +37,7 @@ namespace PaycoreProject.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public virtual IActionResult GetById(int id)
         {
@@ -52,7 +55,7 @@ namespace PaycoreProject.Controllers
 
             return Ok(result);
         }
-
+        [Authorize]
         [HttpPost]
         public virtual IActionResult Create([FromBody] CategoryDto dto)
         {
@@ -75,7 +78,7 @@ namespace PaycoreProject.Controllers
 
             return BadRequest(result);
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public virtual IActionResult Update(int id, [FromBody] CategoryDto dto)
         {
@@ -99,6 +102,7 @@ namespace PaycoreProject.Controllers
             return BadRequest(result);
         }
 
+        [Authorize]
         [HttpDelete]
         public virtual IActionResult Delete(int id)
         {

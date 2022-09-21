@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PaycoreProject.Model;
 using PaycoreProject.Services.Abstract;
@@ -19,7 +20,7 @@ namespace PaycoreProject.Controllers
             this.userService = userService;
             this.offerService = offerService;
         }
-
+        [Authorize]
         [HttpPost("giveoffer")]
         public virtual IActionResult GiveOffer([FromBody] GiveOfferDto dto)
         {
@@ -42,11 +43,15 @@ namespace PaycoreProject.Controllers
 
             return BadRequest(result);
         }
+
+        [Authorize]
         [HttpPost("approval")]
         public IActionResult OfferApproval(int offerId)
         {
             return Ok(offerService.OfferApproval(offerId));
         }
+
+        [Authorize]
         [HttpPost("denied")]
         public IActionResult OfferDenied(int offerId)
         {
