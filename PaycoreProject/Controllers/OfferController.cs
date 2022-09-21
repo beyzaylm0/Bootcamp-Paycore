@@ -43,14 +43,14 @@ namespace PaycoreProject.Controllers
             return BadRequest(result);
         }
         [HttpPost("approval")]
-        public IActionResult OfferApproval(int offerId, int approval)
+        public IActionResult OfferApproval(int offerId)
         {
-            return Ok(offerService.OfferApproval(offerId, approval));
+            return Ok(offerService.OfferApproval(offerId));
         }
         [HttpPost("denied")]
-        public IActionResult OfferDenied(int offerId, int approval)
+        public IActionResult OfferDenied(int offerId)
         {
-            return Ok(offerService.OfferDenied(offerId, approval));
+            return Ok(offerService.OfferDenied(offerId));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PaycoreProject.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PaycoreProject.Model
 {
     public class ProductDto
     {
@@ -10,6 +12,7 @@
         public virtual bool isOfferable { get; set; }
         public virtual bool isSold { get; set; }
         public virtual int UserId { get; set; }
+        [Required]
         public virtual Category Category { get; set; }
     }
 }

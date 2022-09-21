@@ -22,14 +22,14 @@ namespace PaycoreProject.Controllers
             this.mailService = mailService;
         }
 
-
+        //api​/User​/login
         [HttpPost("login")]
-        public IActionResult Authenticate(AuthenticateRequest model)
+        public IActionResult Login(AuthenticateRequest model)
         {
             var response = userService.Authenticate(model);
             return Ok(response);
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterRequest user)
         {

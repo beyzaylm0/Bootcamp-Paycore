@@ -17,13 +17,7 @@ namespace QueueManagement.Mail
     public class MailService : BackgroundService //Allows the email service to run in the background
 
     {
-        // QueueName : GönderilecekMailler
-
-        // Start => Rabbitmq connect, queue declare, consumer start
-
-        // kuyrukla => rabbit'e gödnerilecek maili gönderecek
-
-        // Consume eden metotta gelen mesajları email olarak gödnerecek.
+       
         private readonly RabbitMQService _rabbitMQService;
 
         private const string QUEUE_NAME = "MailsToBeSent";
@@ -51,7 +45,7 @@ namespace QueueManagement.Mail
            await SendMailAsync(mailOBJ);
             await Task.CompletedTask;
 
-            // MAİL OLARAK GONDER
+            
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

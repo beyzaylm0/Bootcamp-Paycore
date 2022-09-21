@@ -67,14 +67,13 @@ namespace PaycoreProject.Services.Concrete
             }
         }
         //This method accepts incoming offers
-        public BaseResponse<IActionResult> OfferApproval(int offerId, int approval)
+        public BaseResponse<IActionResult> OfferApproval(int offerId)
         {
             try
             {
 
                 var tempEntity = hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-                if (approval == (int)ApprovalStatusEnum.Approval)
-                {
+                
                     var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
                     tempProduct.isSold = true;
                     tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Approval;
@@ -87,7 +86,7 @@ namespace PaycoreProject.Services.Concrete
                     hibernateOfferRepository.Update(tempEntity);
                     hibernateOfferRepository.Commit();
                     hibernateOfferRepository.CloseTransaction();
-                }
+                
                 return new BaseResponse<IActionResult>("Offer approved");
             }
             catch (Exception ex)
@@ -101,15 +100,14 @@ namespace PaycoreProject.Services.Concrete
             }
         }
         //This method rejects incoming offers
-        public BaseResponse<IActionResult> OfferDenied(int offerId, int approval)
+        public BaseResponse<IActionResult> OfferDenied(int offerId)
         {
             try
             {
 
                 var tempEntity = hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-                if (approval == (int)ApprovalStatusEnum.Denied)
-                {
-                    var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
+                
+                    var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.ProductId.Id);
                     tempProduct.isSold = false;
                     tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Denied;
                     hibernateProductRepository.BeginTransaction();
@@ -121,8 +119,12 @@ namespace PaycoreProject.Services.Concrete
                     hibernateOfferRepository.Update(tempEntity);
                     hibernateOfferRepository.Commit();
                     hibernateOfferRepository.CloseTransaction();
-                }
-                return new BaseResponse<IActionResult>("Offer denied");
+
+                    return new BaseResponse<IActionResult>("Offer denied");
+
+                
+               
+
             }
             catch (Exception ex)
             {
