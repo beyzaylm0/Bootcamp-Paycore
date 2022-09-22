@@ -4,8 +4,7 @@ Aşağıdaki repository klonlayınız.
 
 [https://github.com/beyzaylm0/Bootcamp-Paycore.git](https://github.com/beyzaylm0/Bootcamp-Paycore.git)
 
-
-![image](https://user-images.githubusercontent.com/72231629/191610731-afd24dd6-397b-401e-ae4c-2821fac2f20e.png)
+![image](https://user-images.githubusercontent.com/72231629/191675118-efa9da2e-930d-41b7-a7cf-6429b8b996f1.png)
 
 
 ### Login
