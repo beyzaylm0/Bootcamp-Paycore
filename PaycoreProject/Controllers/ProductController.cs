@@ -113,7 +113,15 @@ namespace PaycoreProject.Controllers
 
             return BadRequest(result);
         }
-
-       
+        [HttpPost("buy")]
+        public virtual IActionResult Buy(SoldDto sold)
+        {
+            var result=service.Buy(sold);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest("Product don't buy");
+        }
     }
 }

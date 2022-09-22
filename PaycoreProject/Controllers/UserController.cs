@@ -33,14 +33,14 @@ namespace PaycoreProject.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterRequest user)
         {
+            
+            userService.Register(user);
             MailModel emailresult = new MailModel()
             {
-                Message="Hoşgeldiniz",
-                Email=user.Email,
+                Message = "Welcome",
+                Email = user.Email,
             };
             mailService.AddToMailQueue(emailresult);
-
-            userService.Register(user);
             return Ok(new {message="Registration successfull"});
         }
         [Authorize]

@@ -5,6 +5,8 @@ using PaycoreProject.Helpers;
 using PaycoreProject.Model;
 using PaycoreProject.Repository;
 using PaycoreProject.Services.Abstract;
+using QueueManagement.Mail;
+using QueueManagement.ValueObjects;
 using Serilog;
 using System;
 using System.Linq;
@@ -18,8 +20,8 @@ namespace PaycoreProject.Services.Concrete
         private readonly IHibernateRepository<Product> hibernateProductRepository;
         private readonly IHibernateRepository<User> hibernateUserRepository;
         private readonly IHibernateRepository<GiveOffer> hibernateOfferRepository;
-
-        public OfferService(IMapper mapper, ISession session)
+        private readonly MailService mailService;
+        public OfferService(IMapper mapper, ISession session, MailService mailService)
         {
             this.session = session;
             this.mapper = mapper;
@@ -27,6 +29,7 @@ namespace PaycoreProject.Services.Concrete
             hibernateProductRepository = new HibernateRepository<Product>(session);
             hibernateUserRepository = new HibernateRepository<User>(session);
             hibernateOfferRepository = new HibernateRepository<GiveOffer>(session);
+            this.mailService = mailService;
         }
         //This method bids the product
         public BaseResponse<GiveOfferDto> GiveOffer(GiveOfferDto giveOfferDto)
@@ -56,6 +59,13 @@ namespace PaycoreProject.Services.Concrete
                 hibernateOfferRepository.Commit();
 
                 hibernateOfferRepository.CloseTransaction();
+
+                MailModel emailresult = new MailModel()
+                {
+                    Message = "Offer send",
+                    Email = user.Email,
+                };
+                mailService.AddToMailQueue(emailresult);
                 return new BaseResponse<GiveOfferDto>(mapper.Map<GiveOffer, GiveOfferDto>(tempEntity));
             }
             catch (Exception ex)

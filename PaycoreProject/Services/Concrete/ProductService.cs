@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NHibernate;
 using PaycoreProject.Helpers;
 using PaycoreProject.Model;
 using PaycoreProject.Repository;
 using PaycoreProject.Services.Abstract;
-using Serilog;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +24,8 @@ namespace PaycoreProject.Services.Concrete
         private readonly IHibernateRepository<User> hibernateUserRepository;
         private readonly IHibernateRepository<GiveOffer> hibernateOfferRepository;
         private readonly IHibernateRepository<Sold> hibernateSoldRepository;
-
-        public ProductService(IMapper mapper, ISession session)
+        private readonly ILogger<ProductService> logger;
+        public ProductService(IMapper mapper, ISession session, ILogger<ProductService> logger)
         {
             this.session = session;
             this.mapper = mapper;
@@ -34,8 +35,9 @@ namespace PaycoreProject.Services.Concrete
             hibernateUserRepository = new HibernateRepository<User>(session);
             hibernateOfferRepository = new HibernateRepository<GiveOffer>(session);
             hibernateSoldRepository = new HibernateRepository<Sold>(session);
+            this.logger = logger;
         }
-       //This method fetch all products
+        //This method fetch all products
         public BaseResponse<IEnumerable<ProductDto>> GetAll()
         {
             try
@@ -44,10 +46,10 @@ namespace PaycoreProject.Services.Concrete
                 var result = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(tempEntity);
                 return new BaseResponse<IEnumerable<ProductDto>>(result);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Log.Error("GetAll", ex);
-                return new BaseResponse<IEnumerable<ProductDto>>(ex.Message);
+                logger.LogError(e.ToString());
+                return new BaseResponse<IEnumerable<ProductDto>>(e.Message);
             }
         }
         //This method returns product by product id
@@ -61,7 +63,7 @@ namespace PaycoreProject.Services.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error("GetById", ex);
+                logger.LogError(ex.ToString());
                 return new BaseResponse<ProductDto>(ex.Message);
             }
         }
@@ -90,7 +92,7 @@ namespace PaycoreProject.Services.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error("Insert", ex);
+                logger.LogError(ex.ToString());
                 hibernateRepository.Rollback();
                 hibernateRepository.CloseTransaction();
                 return new BaseResponse<ProductDto>(ex.Message);
@@ -116,7 +118,7 @@ namespace PaycoreProject.Services.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error("Remove", ex);
+                logger.LogError(ex.ToString());
                 hibernateRepository.Rollback();
                 hibernateRepository.CloseTransaction();
                 return new BaseResponse<ProductDto>(ex.Message);
@@ -146,53 +148,13 @@ namespace PaycoreProject.Services.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error("Update", ex);
+                logger.LogError(ex.ToString());
                 hibernateRepository.Rollback();
                 hibernateRepository.CloseTransaction();
                 return new BaseResponse<ProductDto>(ex.Message);
             }
         }
-        //This method bids the product
-        //public BaseResponse<GiveOfferDto> GiveOffer(GiveOfferDto giveOfferDto)
-        //{
-        //    try
-        //    {
-
-        //        var tempEntity = mapper.Map<GiveOfferDto, GiveOffer>(giveOfferDto);
-        //        var user = hibernateUserRepository.GetAll().Find(x => x.Id == tempEntity.BidderUser.Id);
-        //        var product = hibernateRepository.GetAll().Find(x => x.Id == tempEntity.ProductId.Id);
-
-        //        if (user == null)
-        //        {
-        //            return new BaseResponse<GiveOfferDto>("User not found");
-        //        }
-        //        if (product == null)
-        //        {
-        //            return new BaseResponse<GiveOfferDto>("Product not found");
-        //        }
-        //        if (product.isOfferable == false)
-        //        {
-        //            return new BaseResponse<GiveOfferDto>("This product can not be bid.");
-        //        }
-
-        //        hibernateOfferRepository.BeginTransaction();
-        //        hibernateOfferRepository.Save(tempEntity);
-        //        hibernateOfferRepository.Commit();
-
-        //        hibernateRepository.CloseTransaction();
-        //        return new BaseResponse<GiveOfferDto>(mapper.Map<GiveOffer, GiveOfferDto>(tempEntity));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error("Insert", ex);
-        //        hibernateOfferRepository.Rollback();
-        //        hibernateOfferRepository.CloseTransaction();
-        //        return new BaseResponse<GiveOfferDto>(ex.Message);
-        //    }
-        //}
-
-
-        //This method buys product
+       
         public BaseResponse<SoldDto> Buy(SoldDto soldDto)
         {
             try
@@ -225,7 +187,7 @@ namespace PaycoreProject.Services.Concrete
             }
             catch (Exception ex)
             {
-                Log.Error("update", ex);
+                logger.LogError(ex.ToString());
                 hibernateSoldRepository.Rollback();
                 hibernateSoldRepository.CloseTransaction();
                 return new BaseResponse<SoldDto>(ex.Message);

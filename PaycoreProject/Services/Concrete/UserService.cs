@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NHibernate;
 using NHibernate.Mapping;
 using NHibernate.Mapping.ByCode.Impl;
@@ -31,14 +32,17 @@ namespace PaycoreProject.Services.Concrete
         private readonly IHibernateRepository<GiveOffer> _hibernateOfferRepository;
         private readonly IHibernateRepository<Product> _hibernateProductRepository;
         private IJwtUtils _jwtUtils;
+        private ILogger<UserService> _logger;
+
         public UserService(IMapper mapper, IHibernateRepository<User> hibernateRepository, IJwtUtils jwtUtils, IHibernateRepository<GiveOffer> hibernateOfferRepository,
-            IHibernateRepository<Product> hibernateProductRepository)
+            IHibernateRepository<Product> hibernateProductRepository, ILogger<UserService> logger)
         {
             _hibernateRepository = hibernateRepository;
             _mapper = mapper;
             _jwtUtils = jwtUtils;
             _hibernateOfferRepository = hibernateOfferRepository;
             _hibernateProductRepository = hibernateProductRepository;
+            _logger = logger;
         }
 
         public IEnumerable<User> GetAll()
@@ -57,16 +61,27 @@ namespace PaycoreProject.Services.Concrete
         }
         public BaseResponse<AuthenticateResponse> Authenticate(AuthenticateRequest model)
         {
-            var user = _hibernateRepository.Entities.SingleOrDefault(x => x.Email == model.Email);
+            try
+            {
+                var user = _hibernateRepository.Entities.SingleOrDefault(x => x.Email == model.Email);
 
-            // validate
-            if (user == null || !BCryptNet.Verify(model.Password, user.Password))
-                throw new AppException("Username or password is incorrect");
+                // validate
+                if (user == null || !BCryptNet.Verify(model.Password, user.Password))
+                    throw new AppException("Username or password is incorrect");
 
-            // authentication successful
-           
-            var response = _jwtUtils.GenerateToken(model);
-            return response;
+                // authentication successful
+
+                var response = _jwtUtils.GenerateToken(model);
+                return response;
+            }
+            catch (Exception e)
+            {
+
+                _logger.LogError(e.ToString());
+                return new BaseResponse<AuthenticateResponse>(e.Message);
+
+            }
+
         }
 
 
@@ -85,10 +100,10 @@ namespace PaycoreProject.Services.Concrete
                 _hibernateRepository.Save(user);
                 _hibernateRepository.Commit();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 _hibernateRepository.Rollback();
-                Log.Error(ex, "Register Error");
+                _logger.LogError(e.ToString());
             }
             finally
             {
@@ -116,10 +131,10 @@ namespace PaycoreProject.Services.Concrete
                 }
                 return new BaseResponse<IEnumerable<GiveOfferResult>>(resultList);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Log.Error("BaseService.GetAll", ex);
-                return new BaseResponse<IEnumerable<GiveOfferResult>>(ex.Message);
+                _logger.LogError(e.ToString());
+                return new BaseResponse<IEnumerable<GiveOfferResult>>(e.Message);
             }
         }
         //method that lists offers of the user's products
@@ -149,81 +164,14 @@ namespace PaycoreProject.Services.Concrete
 
                 return new BaseResponse<IEnumerable<GiveOfferResult>>(resultList);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Log.Error("GetAll", ex);
-                return new BaseResponse<IEnumerable<GiveOfferResult>>(ex.Message);
+                _logger.LogError(e.ToString());
+                return new BaseResponse<IEnumerable<GiveOfferResult>>(e.Message);
             }
         }
 
-        ////This method accepts incoming offers
-        //public BaseResponse<IActionResult> OfferApproval(int offerId, int approval)
-        //{
-        //    try
-        //    {
-
-        //        var tempEntity = _hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-        //        if (approval == (int)ApprovalStatusEnum.Approval)
-        //        {
-        //            var tempProduct = _hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
-        //            tempProduct.isSold = true;
-        //            tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Approval;
-        //            _hibernateProductRepository.BeginTransaction();
-        //            _hibernateProductRepository.Update(tempProduct);
-        //            _hibernateProductRepository.Commit();
-        //            _hibernateProductRepository.CloseTransaction();
-
-        //            _hibernateOfferRepository.BeginTransaction();
-        //            _hibernateOfferRepository.Update(tempEntity);
-        //            _hibernateOfferRepository.Commit();
-        //            _hibernateOfferRepository.CloseTransaction();
-        //        }
-        //        return new BaseResponse<IActionResult>("Offer approved");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _hibernateProductRepository.Rollback();
-        //        _hibernateProductRepository.CloseTransaction();
-        //        _hibernateOfferRepository.Rollback();
-        //        _hibernateOfferRepository.CloseTransaction();
-        //        Log.Error("update", ex);
-        //        return new BaseResponse<IActionResult>(ex.Message);
-        //    }
-        //}
-        ////This method rejects incoming offers
-        //public BaseResponse<IActionResult> OfferDenied(int offerId, int approval)
-        //{
-        //    try
-        //    {
-
-        //        var tempEntity = _hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-        //        if (approval == (int)ApprovalStatusEnum.Denied)
-        //        {
-        //            var tempProduct = _hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
-        //            tempProduct.isSold = false;
-        //            tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Denied;
-        //            _hibernateProductRepository.BeginTransaction();
-        //            _hibernateProductRepository.Update(tempProduct);
-        //            _hibernateProductRepository.Commit();
-        //            _hibernateProductRepository.CloseTransaction();
-
-        //            _hibernateOfferRepository.BeginTransaction();
-        //            _hibernateOfferRepository.Update(tempEntity);
-        //            _hibernateOfferRepository.Commit();
-        //            _hibernateOfferRepository.CloseTransaction();
-        //        }
-        //        return new BaseResponse<IActionResult>("Offer denied");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _hibernateProductRepository.Rollback();
-        //        _hibernateProductRepository.CloseTransaction();
-        //        _hibernateOfferRepository.Rollback();
-        //        _hibernateOfferRepository.CloseTransaction();
-        //        Log.Error("update", ex);
-        //        return new BaseResponse<IActionResult>(ex.Message);
-        //    }
-        //}
+       
     }
 
 }
