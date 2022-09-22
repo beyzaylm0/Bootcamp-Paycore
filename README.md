@@ -1,3 +1,13 @@
+
+ # Proje Hakkında 
+- Proje .NET 5 ASP.NET Web API ile geliştirilmiştir.
+
+- ORM aracı olarak Nhibernate kullanılmıştır.
+
+- Veritabanı olarak PostgreSql kullanılmıştır.
+
+- Veritabanı update modda çalıştığı için appsettings.json da kendi connection bilgilerinizi vermeniz yeterlidir.
+- Mail servis için RabbitMQ kullanarak kuyruklama işlemi yapılmıştır.
 # Kurulum
 
 Aşağıdaki repository klonlayınız.
