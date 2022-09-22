@@ -31,6 +31,10 @@ namespace QueueManagement.RabbitMQ
         {
             try
             {
+                //We define the host that RabbitMQ will connect to.
+                //If we want to take any security measures,
+                //it is sufficient to define the password steps from the Management screen and set the "UserName" and "Password" properties in the factory.
+
                 var factory = new ConnectionFactory()
                 {
                     HostName = _config.Host,
@@ -65,10 +69,12 @@ namespace QueueManagement.RabbitMQ
             }
         }
 
+
         public async Task RegisterConsumerAsync<T>(string queueName, Func<T, Task> function)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
+            //Received event will always be in listen mode
             consumer.Received += async (model, ea) =>
             {
                 try

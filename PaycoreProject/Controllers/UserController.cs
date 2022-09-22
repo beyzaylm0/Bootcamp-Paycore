@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PaycoreProject.Model;
 using PaycoreProject.Services.Abstract;
 using QueueManagement.Mail;
 using QueueManagement.ValueObjects;
-using System.Threading.Tasks;
 
 namespace PaycoreProject.Controllers
 {
@@ -33,7 +31,7 @@ namespace PaycoreProject.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterRequest user)
         {
-            
+
             userService.Register(user);
             MailModel emailresult = new MailModel()
             {
@@ -41,13 +39,13 @@ namespace PaycoreProject.Controllers
                 Email = user.Email,
             };
             mailService.AddToMailQueue(emailresult);
-            return Ok(new {message="Registration successfull"});
+            return Ok(new { message = "Registration successfull" });
         }
         [Authorize]
         [HttpGet]
         public IActionResult GetUserOffer(int userId)
         {
-          return  Ok(userService.GetUserOffer(userId));
+            return Ok(userService.GetUserOffer(userId));
         }
         [Authorize]
         [HttpGet("OfferForProducts")]

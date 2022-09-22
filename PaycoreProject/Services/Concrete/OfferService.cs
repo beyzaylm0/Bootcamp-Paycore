@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using API.Enum;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NHibernate;
 using PaycoreProject.Helpers;
@@ -13,7 +14,7 @@ using System.Linq;
 
 namespace PaycoreProject.Services.Concrete
 {
-    public class OfferService: IOfferService
+    public class OfferService : IOfferService
     {
         private readonly ISession session;
         private readonly IMapper mapper;
@@ -83,20 +84,20 @@ namespace PaycoreProject.Services.Concrete
             {
 
                 var tempEntity = hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-                
-                    var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
-                    tempProduct.isSold = true;
-                    tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Approval;
-                    hibernateProductRepository.BeginTransaction();
-                    hibernateProductRepository.Update(tempProduct);
-                    hibernateProductRepository.Commit();
-                    hibernateProductRepository.CloseTransaction();
 
-                    hibernateOfferRepository.BeginTransaction();
-                    hibernateOfferRepository.Update(tempEntity);
-                    hibernateOfferRepository.Commit();
-                    hibernateOfferRepository.CloseTransaction();
-                
+                var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.Id);
+                tempProduct.isSold = true;
+                tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Approval;
+                hibernateProductRepository.BeginTransaction();
+                hibernateProductRepository.Update(tempProduct);
+                hibernateProductRepository.Commit();
+                hibernateProductRepository.CloseTransaction();
+
+                hibernateOfferRepository.BeginTransaction();
+                hibernateOfferRepository.Update(tempEntity);
+                hibernateOfferRepository.Commit();
+                hibernateOfferRepository.CloseTransaction();
+
                 return new BaseResponse<IActionResult>("Offer approved");
             }
             catch (Exception ex)
@@ -116,24 +117,24 @@ namespace PaycoreProject.Services.Concrete
             {
 
                 var tempEntity = hibernateOfferRepository.Entities.FirstOrDefault(x => x.Id == offerId);
-                
-                    var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.ProductId.Id);
-                    tempProduct.isSold = false;
-                    tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Denied;
-                    hibernateProductRepository.BeginTransaction();
-                    hibernateProductRepository.Update(tempProduct);
-                    hibernateProductRepository.Commit();
-                    hibernateProductRepository.CloseTransaction();
 
-                    hibernateOfferRepository.BeginTransaction();
-                    hibernateOfferRepository.Update(tempEntity);
-                    hibernateOfferRepository.Commit();
-                    hibernateOfferRepository.CloseTransaction();
+                var tempProduct = hibernateProductRepository.GetAll().FirstOrDefault(x => x.Id == tempEntity.ProductId.Id);
+                tempProduct.isSold = false;
+                tempEntity.ApprovalStatus = (int)ApprovalStatusEnum.Denied;
+                hibernateProductRepository.BeginTransaction();
+                hibernateProductRepository.Update(tempProduct);
+                hibernateProductRepository.Commit();
+                hibernateProductRepository.CloseTransaction();
 
-                    return new BaseResponse<IActionResult>("Offer denied");
+                hibernateOfferRepository.BeginTransaction();
+                hibernateOfferRepository.Update(tempEntity);
+                hibernateOfferRepository.Commit();
+                hibernateOfferRepository.CloseTransaction();
 
-                
-               
+                return new BaseResponse<IActionResult>("Offer denied");
+
+
+
 
             }
             catch (Exception ex)
